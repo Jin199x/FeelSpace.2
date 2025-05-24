@@ -65,7 +65,7 @@ rantForm.addEventListener('submit', async (e) => {
     await addDoc(collection(db, 'users', currentUser.uid, 'journals'), {
       text: rantText.value.trim(),
       createdAt: serverTimestamp()
-       deleted: false
+      deleted: false
     });
 
     confirmation.style.display = 'block';
