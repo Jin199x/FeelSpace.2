@@ -41,11 +41,6 @@ onAuthStateChanged(auth, (user) => {
 rantForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  if (!currentUser) {
-    alert('You need to be logged in to save your journal.');
-    return;
-  }
-
   const words = rantText.value.trim().split(/\s+/).filter(Boolean);
 
   if (words.length === 0) {
