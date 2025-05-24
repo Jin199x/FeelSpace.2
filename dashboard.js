@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { collection, query, orderBy, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const journalList = document.getElementById('journalList');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -10,24 +10,21 @@ const journalModal = document.getElementById('journalModal');
 const modalContent = document.getElementById('modalContent');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = 'login.html';
     return;
   }
 
-  try {
-    const q = query(
-      collection(db, 'users', user.uid, 'journals'),
-      orderBy('createdAt', 'desc')
-    );
+  const q = query(
+    collection(db, 'users', user.uid, 'journals'),
+    orderBy('createdAt', 'desc')
+  );
 
-    const querySnapshot = await getDocs(q);
-
-    // Map docs and filter out journals where deleted === true
+  onSnapshot(q, (querySnapshot) => {
     const journals = querySnapshot.docs
       .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
-      .filter(journal => journal.deleted !== true);
+      .filter(journal => !journal.deleted);
 
     if (journals.length === 0) {
       journalList.innerHTML = '<li>No journals yet. Start writing your feelings.</li>';
@@ -52,12 +49,10 @@ onAuthStateChanged(auth, async (user) => {
         editBtn.textContent = 'Edit';
         editBtn.style.marginLeft = '10px';
         editBtn.addEventListener('click', async (e) => {
-          e.stopPropagation(); // Prevent triggering modal open
+          e.stopPropagation(); // Prevent modal open
           const newText = prompt('Edit your journal:', journal.text);
           if (newText !== null && newText.trim() !== '') {
             await updateJournal(journal.id, newText.trim());
-            li.firstChild.textContent = `${date} — ${newText.substring(0, 100)}${newText.length > 100 ? '...' : ''}`;
-            journal.text = newText.trim(); // update local data for modal
           }
         });
         li.appendChild(editBtn);
@@ -67,10 +62,9 @@ onAuthStateChanged(auth, async (user) => {
         deleteBtn.textContent = 'Delete';
         deleteBtn.style.marginLeft = '5px';
         deleteBtn.addEventListener('click', async (e) => {
-          e.stopPropagation(); // Prevent triggering modal open
+          e.stopPropagation(); // Prevent modal open
           if (confirm('Are you sure you want to delete this entry?')) {
             await softDeleteJournal(journal.id);
-            li.remove();
           }
         });
         li.appendChild(deleteBtn);
@@ -78,10 +72,7 @@ onAuthStateChanged(auth, async (user) => {
         journalList.appendChild(li);
       });
     }
-  } catch (err) {
-    console.error('Error loading journals:', err);
-    journalList.innerHTML = '<li>Error loading journals.</li>';
-  }
+  });
 });
 
 logoutBtn.addEventListener('click', () => {
@@ -94,7 +85,6 @@ newEntryBtn.addEventListener('click', () => {
   window.location.href = 'index.html';
 });
 
-// Modal close button
 closeModalBtn.addEventListener('click', () => {
   journalModal.style.display = 'none';
 });
