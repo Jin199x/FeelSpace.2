@@ -56,17 +56,19 @@ rantForm.addEventListener('submit', async (e) => {
   confirmation.style.display = 'none';
 
   try {
+    // Always save to public rants collection
     await addDoc(collection(db, 'rants'), {
       text: rantText.value.trim(),
       createdAt: serverTimestamp()
     });
 
-    // Save journal in subcollection users/{uid}/journals
-    await addDoc(collection(db, 'users', currentUser.uid, 'journals'), {
-      text: rantText.value.trim(),
-      createdAt: serverTimestamp()
-   
-    });
+    // If logged in, also save to user-specific journals
+    if (currentUser) {
+      await addDoc(collection(db, 'users', currentUser.uid, 'journals'), {
+        text: rantText.value.trim(),
+        createdAt: serverTimestamp()
+      });
+    }
 
     confirmation.style.display = 'block';
     rantForm.reset();
