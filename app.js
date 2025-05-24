@@ -61,6 +61,11 @@ rantForm.addEventListener('submit', async (e) => {
   confirmation.style.display = 'none';
 
   try {
+    await addDoc(collection(db, 'rants'), {
+      text: rantText.value.trim(),
+      createdAt: serverTimestamp()
+    });
+
     // Save journal in subcollection users/{uid}/journals
     await addDoc(collection(db, 'users', currentUser.uid, 'journals'), {
       text: rantText.value.trim(),
