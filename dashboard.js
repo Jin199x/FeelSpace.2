@@ -1,6 +1,6 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { collection, query, orderBy, getDocs, doc, updateDoc, where } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { collection, query, orderBy, getDocs, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const journalList = document.getElementById('journalList');
 const logoutBtn = document.getElementById('logoutBtn');
@@ -19,28 +19,31 @@ onAuthStateChanged(auth, async (user) => {
   try {
     const q = query(
       collection(db, 'users', user.uid, 'journals'),
-      where('deleted', '!=', true),
       orderBy('createdAt', 'desc')
     );
 
     const querySnapshot = await getDocs(q);
 
-    if (querySnapshot.empty) {
+    // Map docs and filter out journals where deleted === true
+    const journals = querySnapshot.docs
+      .map(docSnap => ({ id: docSnap.id, ...docSnap.data() }))
+      .filter(journal => journal.deleted !== true);
+
+    if (journals.length === 0) {
       journalList.innerHTML = '<li>No journals yet. Start writing your feelings.</li>';
     } else {
       journalList.innerHTML = '';
 
-      querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const date = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString() : 'Unknown date';
+      journals.forEach(journal => {
+        const date = journal.createdAt?.toDate ? journal.createdAt.toDate().toLocaleString() : 'Unknown date';
 
         const li = document.createElement('li');
         li.style.cursor = 'pointer';
-        li.textContent = `${date} — ${data.text.substring(0, 100)}${data.text.length > 100 ? '...' : ''}`;
+        li.textContent = `${date} — ${journal.text.substring(0, 100)}${journal.text.length > 100 ? '...' : ''}`;
 
         // Open modal with full text on snippet click
         li.addEventListener('click', () => {
-          modalContent.textContent = data.text;
+          modalContent.textContent = journal.text;
           journalModal.style.display = 'flex';
         });
 
@@ -50,11 +53,11 @@ onAuthStateChanged(auth, async (user) => {
         editBtn.style.marginLeft = '10px';
         editBtn.addEventListener('click', async (e) => {
           e.stopPropagation(); // Prevent triggering modal open
-          const newText = prompt('Edit your journal:', data.text);
+          const newText = prompt('Edit your journal:', journal.text);
           if (newText !== null && newText.trim() !== '') {
-            await updateJournal(docSnap.id, newText.trim());
+            await updateJournal(journal.id, newText.trim());
             li.firstChild.textContent = `${date} — ${newText.substring(0, 100)}${newText.length > 100 ? '...' : ''}`;
-            data.text = newText.trim(); // update local data for modal
+            journal.text = newText.trim(); // update local data for modal
           }
         });
         li.appendChild(editBtn);
@@ -66,7 +69,7 @@ onAuthStateChanged(auth, async (user) => {
         deleteBtn.addEventListener('click', async (e) => {
           e.stopPropagation(); // Prevent triggering modal open
           if (confirm('Are you sure you want to delete this entry?')) {
-            await softDeleteJournal(docSnap.id);
+            await softDeleteJournal(journal.id);
             li.remove();
           }
         });
