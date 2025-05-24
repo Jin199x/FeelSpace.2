@@ -54,22 +54,21 @@ rantForm.addEventListener('submit', async (e) => {
   }
 
   confirmation.style.display = 'none';
-
-  try {
-    // Always save to public rants collection
-    await addDoc(collection(db, 'rants'), {
-      text: rantText.value.trim(),
-      createdAt: serverTimestamp()
-    });
-
-    // If logged in, also save to user-specific journals
-    if (currentUser) {
-      await addDoc(collection(db, 'users', currentUser.uid, 'journals'), {
-        text: rantText.value.trim(),
-        createdAt: serverTimestamp()
-      });
-    }
-
+  
+if (currentUser) {
+  // Save only to private user journal if logged in
+  await addDoc(collection(db, 'users', currentUser.uid, 'journals'), {
+    text: rantText.value.trim(),
+    createdAt: serverTimestamp()
+  });
+} else {
+  // Save to public rants only if user NOT logged in
+  await addDoc(collection(db, 'rants'), {
+    text: rantText.value.trim(),
+    createdAt: serverTimestamp()
+  });
+}
+  
     confirmation.style.display = 'block';
     rantForm.reset();
     wordCount.textContent = `0 / ${MAX_WORDS} words`;
