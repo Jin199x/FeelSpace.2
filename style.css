@@ -1,0 +1,138 @@
+body {
+  margin: 0;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background-color: #ffe6f0;
+  color: #880e4f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  background-color: #fff0f5;
+  border-radius: 20px;
+  padding: 30px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 8px 20px rgba(136, 14, 79, 0.1);
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.2em;
+  margin-bottom: 0.4em;
+  color: #d81b60;
+}
+
+p {
+  text-align: center;
+  font-size: 1em;
+  margin-bottom: 1.5em;
+}
+
+textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid #f8bbd0;
+  border-radius: 10px;
+  resize: vertical;
+  font-size: 1em;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+#wordCount {
+  margin-top: 10px;
+  font-size: 0.9em;
+  text-align: right;
+  color: #880e4f;
+}
+
+button {
+  display: block;
+  width: 100%;
+  background-color: #f06292;
+  font-family: 'Indie Flower', cursive;
+  color: white;
+  padding: 15px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ec407a;
+}
+
+.nav-links {
+  margin-bottom: 1em;
+  font-size: 0.9em;
+}
+
+.nav-links a {
+  color: #4A4A4A;
+  text-decoration: none;
+  margin: 0 0.5em;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
+
+.message {
+  text-align: center;
+  margin-top: 20px;
+  background-color: #f8bbd0;
+  padding: 15px;
+  border-radius: 10px;
+  font-style: italic;
+  font-size: 0.95em;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 1.8em;
+  }
+
+  p {
+    font-size: 0.95em;
+  }
+
+  button {
+    font-size: 1em;
+    padding: 12px;
+  }
+
+  textarea {
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.6em;
+  }
+
+  p {
+    font-size: 0.9em;
+  }
+
+  #wordCount {
+    font-size: 0.85em;
+  }
+
+  .message {
+    font-size: 0.9em;
+  }
+}

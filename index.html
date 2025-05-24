@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FeelSpace</title>
+  <link rel="stylesheet" href="style.css" />
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="app.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <h1>FeelSpace</h1>
+    <p>Let your soul speak and be forgotten. (2000-word max)</p>
+
+    <!-- Navigation links -->
+    <nav class="nav-links">
+      <a href="login.html">Log In</a> |
+      <a href="signup.html">Sign Up</a>
+    </nav>
+
+    <form id="rantForm">
+      <textarea id="rantText" placeholder="Write your thoughts here..." rows="10"></textarea>
+      <div id="wordCount">0 / 2000 words</div>
+      <button type="submit">Send to the stars</button>
+    </form>
+
+    <div id="confirmation" class="message" style="display:none;">
+      ✨ You’ve sent your feelings to the skies and now hoping for them to vanish with the clouds. ✨
+    </div>
+  </div>
+</body>
+</html>
